@@ -71,7 +71,7 @@ class SmartWebSocket(object):
                 )
                 return True
             except Exception as e:
-                self._close(reason="Error while request sending: {}".format(str(e)))
+                self.ws.sock.send_close(reason=bytes("Error while subscribing scrips: {}".format(str(e)), encoding='utf-8'))
                 raise
         else:
             print("The task entered is invalid, Please enter correct task(mw,sfi,dp) ")
@@ -88,7 +88,7 @@ class SmartWebSocket(object):
                 )
                 return True
             except Exception as e:
-                self._close(reason="Error while request sending: {}".format(str(e)))
+                self.ws.sock.send_close(reason=bytes("Error while re-subscribing scrips: {}".format(str(e)), encoding='utf-8'))
                 raise
         
     def heartBeat(self):        
@@ -144,9 +144,11 @@ class SmartWebSocket(object):
         else:
             self._on_open(ws)
     
-    def __on_close(self, ws):
+    def __on_close(self, ws,  close_status_code, close_reason):
         self.HB_THREAD_FLAG = True
         print("__on_close################")
+        print('close_reason---->'+close_reason)
+        print('close_status_code---->'+str(close_status_code))
         self._on_close(ws)
               
     def __on_error(self, ws, error):
